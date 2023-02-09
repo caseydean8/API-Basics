@@ -1,2 +1,5 @@
     -- connection string
     Server=localhost;Database=DotNetCourseDatabase;Trusted_Connection=false;TrustServerCertificate=True;User Id=sa;Password=SQLConnect1;
+
+    -- open Explorer in Azure Data Studio
+    <C-b>
