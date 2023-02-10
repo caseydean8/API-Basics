@@ -1,5 +1,5 @@
 
-namespace DotnetAPI
+namespace DotnetAPI.Models
 {
     // it's good practice to make Models partial in case you need to add to them later from other files
     public partial class UserSalary

@@ -1,4 +1,4 @@
-namespace DotnetAPI
+namespace DotnetAPI.Dtos
 {
     // it's good practice to make Models partial in case you need to add to them later from other files
     // Dto: data transfer object
