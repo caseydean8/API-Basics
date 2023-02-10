@@ -100,21 +100,45 @@ public class UserController : ControllerBase
 
     [HttpPost("AddUser")]
 
-    public IActionResult AddUser()
+    public IActionResult AddUser(User user)
     {
-        return Ok();
+        string sql = @"
+        INSERT INTO TutorialAppSchema.Users
+            (
+            [FirstName],
+            [LastName],
+            [Email],
+            [Gender],
+            [Active])
+        VALUES
+            (
+             '" + user.FirstName +
+             "', '" + user.LastName +
+             "', '" + user.Email +
+             "', '" + user.Gender +
+             "', '" + user.Active +
+            "')";
+        // "' WHERE UserId = " + user.UserId;
+        Console.WriteLine(sql);
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Add User");
     }
 }
 
+// In HTTP, an endpoint is a specific URL that represents a resource, such as a server, database, or other service. 
+// When a client sends an HTTP request to an endpoint, the server responds with an HTTP response, 
+// which can contain data or other information.
 
+// For example, if you have a web API that provides access to a database of books, you might have an endpoint like "/books" 
+// that represents the collection of all books, and individual endpoints like "/books/123" to represent specific books. 
+// When a client sends a GET request to the "/books" endpoint, the server might respond with a list of all books in the database, 
+// while a GET request to "/books/123" would return information about the book with ID 123.
 
-
-
-
-
-
-
-
-
+// Endpoints are often used in RESTful web services, where each endpoint represents a different resource and supports 
+// different HTTP methods, such as GET, POST, PUT, and DELETE, for accessing and modifying the resource.
 
 
