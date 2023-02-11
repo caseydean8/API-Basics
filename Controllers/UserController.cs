@@ -150,7 +150,6 @@ public class UserController : ControllerBase
         }
 
         throw new Exception("Failed to Delete User");
-
     }
 }
 
