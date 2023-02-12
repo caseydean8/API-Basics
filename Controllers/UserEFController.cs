@@ -1,5 +1,6 @@
 // 4. Testing the Program
 // Before running a program, proofread aka "deskcheck" it...
+using AutoMapper;
 using DotnetAPI.Data;
 using DotnetAPI.Dtos;
 using DotnetAPI.Models;
@@ -20,9 +21,16 @@ public class UserEFController : ControllerBase
     // class DotnetAPI.Data.DataContextEF
     DataContextEF _entityFramework;
 
+    IMapper _mapper;
+
     public UserEFController(IConfiguration config)
     {
         _entityFramework = new DataContextEF(config);
+
+        _mapper = new Mapper(new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<UserToAddDto, User>();
+        }));
     }
 
     [HttpGet("GetUsers")]
@@ -81,21 +89,14 @@ public class UserEFController : ControllerBase
         }
 
         throw new Exception("Failed to Get User");
-
     }
 
 
     [HttpPost("AddUser")]
 
-    public IActionResult AddUser(UserDto user)
+    public IActionResult AddUser(UserToAddDto user)
     {
-        User userDb = new User();
-
-        userDb.Active = user.Active;
-        userDb.FirstName = user.FirstName;
-        userDb.LastName = user.LastName;
-        userDb.Email = user.Email;
-        userDb.Gender = user.Gender;
+        User userDb = _mapper.Map<User>(user);
 
         _entityFramework.Add(userDb);
         if (_entityFramework.SaveChanges() > 0)

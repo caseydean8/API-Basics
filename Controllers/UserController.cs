@@ -41,14 +41,19 @@ public class UserController : ControllerBase
             FROM TutorialAppSchema.Users";
         IEnumerable<User> users = _dapper.LoadData<User>(sql);
         return users;
-        // return new string[] { "user1", "user2"};
-        // return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        // {
-        //     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-        //     TemperatureC = Random.Shared.Next(-20, 55),
-        //     Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        // })
-        // .ToArray();
+    }
+
+    [HttpGet("GetUserJobInfo")]
+
+    public IEnumerable<UserJobInfo> GetUserJobInfo()
+    {
+        string sql = @"
+            SELECT [UserId],
+                [JobTitle],
+                [Department]
+            FROM TutorialAppSchema.UserJobInfo";
+        IEnumerable<UserJobInfo> userJobInfo = _dapper.LoadData<UserJobInfo>(sql);
+        return userJobInfo;
     }
 
 
@@ -69,6 +74,22 @@ public class UserController : ControllerBase
                 WHERE UserId = " + userId.ToString();
         // concatenation (above) is preferable to interpolation due to dapper 4000 character restraint
         User user = _dapper.LoadDataSingle<User>(sql);
+        return user;
+    }
+
+    [HttpGet("GetSingleUserJobInfo/{userId}")]
+
+    public UserJobInfo GetSingleUserJobInfo(int userId)
+    {
+        string sql = @"
+            SELECT 
+                [UserId],
+                [JobTitle],
+                [Department]
+            FROM TutorialAppSchema.UserJobInfo
+                WHERE UserId = " + userId.ToString();
+
+        UserJobInfo user = _dapper.LoadDataSingle<UserJobInfo>(sql);
         return user;
     }
 
@@ -103,9 +124,29 @@ public class UserController : ControllerBase
     }
 
 
+    [HttpPut("EditUserJobInfo")]
+
+    public IActionResult EditUserJobInfo(UserJobInfo userJobInfo)
+    {
+        string sql = @"
+        UPDATE TutorialAppSchema.UserJobInfo
+            SET
+                [JobTitle] = '" + userJobInfo.JobTitle +
+                "', [Department] = '" + userJobInfo.Department +
+            "' WHERE UserId = " + userJobInfo.UserId;
+        Console.WriteLine(sql);
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Update User");
+    }
+
+
     [HttpPost("AddUser")]
 
-    public IActionResult AddUser(UserDto user)
+    public IActionResult AddUser(UserToAddDto userToAdd)
     {
         string sql = @"
         INSERT INTO TutorialAppSchema.Users
@@ -113,15 +154,15 @@ public class UserController : ControllerBase
             [FirstName],
             [LastName],
             [Email],
-            [Gender],
+            [Gender]
             [Active])
         VALUES
             (
-             '" + user.FirstName +
-             "', '" + user.LastName +
-             "', '" + user.Email +
-             "', '" + user.Gender +
-             "', '" + user.Active +
+             '" + userToAdd.FirstName +
+             "', '" + userToAdd.LastName +
+             "', '" + userToAdd.Email +
+             "', '" + userToAdd.Gender +
+             "', '" + userToAdd.Active +
             "')";
 
         Console.WriteLine(sql);
@@ -133,6 +174,30 @@ public class UserController : ControllerBase
         throw new Exception("Failed to Add User");
     }
 
+
+    [HttpPost("AddUserJobInfo")]
+
+    public IActionResult AddUserJobInfo(UserJobInfoDto userJobInfo)
+    {
+        string sql = @"
+        INSERT INTO TutorialAppSchema.UserJobInfo
+            (
+            [JobTitle],
+            [Department])
+        VALUES
+            (
+             '" + userJobInfo.JobTitle +
+             "', '" + userJobInfo.Department +
+            "')";
+
+        Console.WriteLine(sql);
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Add User Job Info");
+    }
     // class Microsoft.AspNetCore.Mvc.HttpDeleteAttribute (+ 2 overloads)
     // Identifies an action that supports the HTTP DELETE method\.
     [HttpDelete("DeleteUser/{userId}")]
@@ -141,6 +206,23 @@ public class UserController : ControllerBase
     {
         string sql = @"
            DELETE FROM TutorialAppSchema.Users 
+              WHERE UserId = " + userId.ToString();
+
+        Console.WriteLine(sql);
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Delete User");
+    }
+
+    [HttpDelete("DeleteUserJobInfo/{userId}")]
+
+    public IActionResult DeleteUserJobInfo(int userId)
+    {
+        string sql = @"
+           DELETE FROM TutorialAppSchema.UserJobInfo 
               WHERE UserId = " + userId.ToString();
 
         Console.WriteLine(sql);

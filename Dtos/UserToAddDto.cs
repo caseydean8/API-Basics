@@ -2,7 +2,7 @@ namespace DotnetAPI.Dtos
 {
     // it's good practice to make Models partial in case you need to add to them later from other files
     // Dto: data transfer object
-    public partial class UserDto
+    public partial class UserToAddDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -10,7 +10,7 @@ namespace DotnetAPI.Dtos
         public string Gender { get; set; }
         public bool Active { get; set; }
 
-        public UserDto()
+        public UserToAddDto()
         {
             if (FirstName == null)
             {
