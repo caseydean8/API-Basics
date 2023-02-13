@@ -43,6 +43,15 @@ public class UserEFController : ControllerBase
     }
 
 
+    [HttpGet("GetUserJobInfo")]
+
+    public IEnumerable<UserJobInfo> GetUserJobInfo()
+    {
+        IEnumerable<UserJobInfo> users = _entityFramework.UserJobInfo.ToList<UserJobInfo>();
+        return users;
+    }
+  
+
     [HttpGet("GetSingleUser/{userId}")]
 
     public User GetSingleUser(int userId)

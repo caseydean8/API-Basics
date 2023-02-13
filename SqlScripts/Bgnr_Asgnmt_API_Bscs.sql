@@ -42,15 +42,18 @@ DELETE FROM TutorialAppSchema.UserJobInfo
 ALTER TABLE TutorialAppSchema.UserJobInfo DROP COLUMN UserId 
 ALTER TABLE TutorialAppSchema.UserJobInfo Add UserId INT IDENTITY(1,1)
 
-ALTER TABLE TutorialAppSchema.UserJobInfo MODIFY UserId INT NOT NULL
+ALTER TABLE TutorialAppSchema.UserJobInfo MODIFY UserId INT NOT NULL -- doesn't work
 
-ALTER TABLE TutorialAppSchema.UserJobInfo DROP PRIMARY KEY
+ALTER TABLE TutorialAppSchema.UserJobInfo DROP PRIMARY KEY -- didn't work
 
-ALTER TABLE TutorialAppSchema.UserJobInfo DROP CONSTRAINT PK_Tutorial
+ALTER TABLE TutorialAppSchema.UserJobInfo DROP CONSTRAINT PK_Tutorial  -- didn't work
+-- See SqlScripts/AddPrimaryKey for
 
 
 SELECT * FROM TutorialAppSchema.UserJobInfo
     -- WHERE UserId = 112
-    WHERE UserId (105, 115)
+    -- Show UserIds in range 105-115
+    WHERE UserId BETWEEN 105 AND 115
+    ORDER BY UserId
 
 

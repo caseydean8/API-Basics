@@ -154,7 +154,7 @@ public class UserController : ControllerBase
             [FirstName],
             [LastName],
             [Email],
-            [Gender]
+            [Gender],
             [Active])
         VALUES
             (
@@ -180,15 +180,37 @@ public class UserController : ControllerBase
     public IActionResult AddUserJobInfo(UserJobInfoDto userJobInfo)
     {
         string sql = @"
+        SET XACT_ABORT ON;
+
+        BEGIN TRANSACTION
+        DECLARE @UserID int;
+        INSERT INTO TutorialAppSchema.Users
+            (
+            [FirstName],
+            [LastName],
+            [Email],
+            [Gender],
+            [Active])
+        VALUES
+            (
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                0
+            )
+        SELECT @UserID = scope_identity();
         INSERT INTO TutorialAppSchema.UserJobInfo
             (
+            [UserId],
             [JobTitle],
             [Department])
         VALUES
             (
-             '" + userJobInfo.JobTitle +
-             "', '" + userJobInfo.Department +
-            "')";
+                @UserID,
+                '" + userJobInfo.JobTitle +
+                "','" + userJobInfo.Department +
+                "') COMMIT";
 
         Console.WriteLine(sql);
         if (_dapper.ExecuteSql(sql))
