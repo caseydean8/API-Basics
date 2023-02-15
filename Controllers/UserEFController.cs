@@ -21,11 +21,17 @@ public class UserEFController : ControllerBase
     // class DotnetAPI.Data.DataContextEF
     DataContextEF _entityFramework;
 
+    IUserRepository _userRepository;
+    // UserRepository _userRepository;
+
     IMapper _mapper;
 
-    public UserEFController(IConfiguration config)
+    public UserEFController(IConfiguration config, IUserRepository userRepository)
+    // public UserEFController(IConfiguration config, UserRepository userRepository)
     {
         _entityFramework = new DataContextEF(config);
+
+        _userRepository = userRepository;
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
         {
@@ -117,7 +123,7 @@ public class UserEFController : ControllerBase
     {
         User? userDb = _entityFramework.Users
           .Where(u => u.UserId == user.UserId)
-          .FirstOrDefault();
+        .FirstOrDefault();
         // .FirstOrDefault<User>();
 
         if (userDb != null)
@@ -127,6 +133,7 @@ public class UserEFController : ControllerBase
             userDb.LastName = user.LastName;
             userDb.Email = user.Email;
             userDb.Gender = user.Gender;
+            // if (_userRepository.SaveChanges())
             if (_entityFramework.SaveChanges() > 0)
             {
                 return Ok();
@@ -155,6 +162,7 @@ public class UserEFController : ControllerBase
             // UserJobInfo IMapperBase.Map<UserJobInfo, UserJobInfo>(UserJobInfo source, UserJobInfo destination) (+ 9 overloads)
             _mapper.Map(userForUpdate, userDb);
             if (_entityFramework.SaveChanges() > 0)
+            // if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
@@ -172,8 +180,9 @@ public class UserEFController : ControllerBase
     {
         User userDb = _mapper.Map<User>(user);
 
-        _entityFramework.Add(userDb);
-        if (_entityFramework.SaveChanges() > 0)
+        // _entityFramework.Add(userDb);
+        // _userRepository.AddEntity<User>(userDb);
+        if (_userRepository.SaveChanges())
         {
             return Ok();
         }
@@ -195,7 +204,7 @@ public class UserEFController : ControllerBase
         if (userDb != null)
         {
             _entityFramework.Users.Remove(userDb);
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 Console.WriteLine($"User {userDb.FirstName} {userDb.LastName} removed");
                 return Ok();

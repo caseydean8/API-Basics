@@ -1,3 +1,5 @@
+using DotnetAPI.Data;
+
 // WebApplicationBuilder WebApplication.CreateBuilder(string[] args) (+ 2 overloads)
 // Initializes a new instance of the `WebApplicationBuilder` class with preconfigured defaults\.
 // Returns: The `WebApplicationBuilder`\.
@@ -28,6 +30,9 @@ builder.Services.AddCors((options) =>
                     .AllowCredentials();
             });
     });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -9,7 +9,8 @@
 // It also makes the data access parts of an application better testable.
 namespace DotnetAPI.Data
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
+    // public class UserRepository // testing w/out IUser... 
     {
 
         DataContextEF _entityFramework;
