@@ -29,8 +29,8 @@ public class UserEFController : ControllerBase
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
         {
-        // Mapper for user doesn't work
-            cfg.CreateMap<User, UserToAddDto>();
+            // Mapper for user doesn't work
+            cfg.CreateMap<UserToAddDto, User>();
             // IMappingExpression<UserJobInfo, UserJobInfo> IProfileExpression.CreateMap<UserJobInfo, UserJobInfo>() (+ 1 overload)
             cfg.CreateMap<UserJobInfo, UserJobInfo>();
             cfg.CreateMap<UserSalary, UserSalary>();
