@@ -24,21 +24,86 @@ FROM TutorialAppSchema.Users AS Users
     JOIN TutorialAppSchema.UserJobInfo AS UserJobInfo
     ON UserJobInfo.UserId = Users.UserId
 
-SELECT * FROM TutorialAppSchema.UserJobInfo
-    ORDER BY UserId DESC
+SELECT *
+FROM TutorialAppSchema.UserJobInfo
+ORDER BY UserId DESC
 
 DELETE FROM TutorialAppSchema.UserJobInfo
-    WHERE UserId IS NULL 
+    WHERE UserId IS NULL
+
+SELECT IDENT_CURRENT('TutorialAppSchema.Users')
+
+INSERT INTO TutorialAppSchema.Users
+    (
+    [FirstName],
+    [LastName],
+    [Email],
+    [Gender],
+    [Active])
+VALUES
+    (
+        'test', 'tester', 't@tester.com', 'dude', 'True')
 
 
-SELECT * FROM TutorialAppSchema.Users
-    ORDER BY UserId DESC
 
+INSERT INTO TutorialAppSchema.Users
+    (
+    [FirstName],
+    [LastName],
+    [Email],
+    [Gender],
+    [Active])
+VALUES
+    (
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        0
+    )
 
+SELECT *
+FROM TutorialAppSchema.Users
+ORDER BY UserId DESC
 
+-- Add User row (with UserId) in Users table and then add UserJobInfo
+-- fields with same UserId to UserJobInfo table
+SET XACT_ABORT ON;
 
+BEGIN TRANSACTION
+DECLARE @UserID int;
+INSERT INTO TutorialAppSchema.Users
+    (
+    [FirstName],
+    [LastName],
+    [Email],
+    [Gender],
+    [Active])
+VALUES
+    (
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        0
+    )
+SELECT @UserID = scope_identity();
+INSERT INTO TutorialAppSchema.UserJobInfo
+    (
+    [UserId],
+    [JobTitle],
+    [Department])
+VALUES
+    (
+        @UserID,
+        'Tester',
+        'Unit Testing'
+    )
+COMMIT
 
-
+SELECT *
+FROM TutorialAppSchema.UserJobInfo
+ORDER BY UserId DESC
 
 
 
