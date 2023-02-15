@@ -57,6 +57,20 @@ public class UserController : ControllerBase
     }
 
 
+    [HttpGet("GetUserSalary")]
+
+    public IEnumerable<UserSalary> GetUserSalary()
+    {
+        string sql = @"
+            SELECT [UserId],
+                [Salary],
+                [AvgSalary]
+            FROM TutorialAppSchema.UserSalary";
+        IEnumerable<UserSalary> userSalary = _dapper.LoadData<UserSalary>(sql);
+        return userSalary;
+    }
+
+
     [HttpGet("GetSingleUser/{userId}")]
     // public IEnumerable<User> GetUser()
 
@@ -103,15 +117,16 @@ public class UserController : ControllerBase
     // IActionResult UserController.EditUser(DotnetAPI.User user) // User from DotnetAPI/Models/Users.cs
     public IActionResult EditUser(User user)
     {
+        // String values need the single quotation mark surround or non-numeric characters will cause an error
         string sql = @"
         UPDATE TutorialAppSchema.Users
             SET
-                [FirstName] = '" + user.FirstName +
-                "', [LastName] = '" + user.LastName +
-                "', [Email] = '" + user.Email +
-                "', [Gender] = '" + user.Gender +
-                "', [Active] = '" + user.Active +
-            "' WHERE UserId = " + user.UserId;
+            [FirstName] = '" + user.FirstName +
+            "', [LastName] = '" + user.LastName +
+              "', [Email] = '" + user.Email +
+              "', [Gender] = '" + user.Gender +
+              "', [Active] = '" + user.Active +
+              "' WHERE UserId = " + user.UserId;
         Console.WriteLine(sql);
         if (_dapper.ExecuteSql(sql))
         {
@@ -126,18 +141,18 @@ public class UserController : ControllerBase
 
     [HttpPut("EditUserJobInfo")]
 
-    public IActionResult EditUserJobInfo(UserJobInfo userJobInfo)
-    {
+      public IActionResult EditUserJobInfo(UserJobInfo userJobInfo)
+      {
         string sql = @"
-        UPDATE TutorialAppSchema.UserJobInfo
-            SET
-                [JobTitle] = '" + userJobInfo.JobTitle +
-                "', [Department] = '" + userJobInfo.Department +
-            "' WHERE UserId = " + userJobInfo.UserId;
+          UPDATE TutorialAppSchema.UserJobInfo
+          SET
+          JobTitle = '" + userJobInfo.JobTitle +
+          "', Department = '" + userJobInfo.Department +
+          "' WHERE UserId = " + userJobInfo.UserId;
         Console.WriteLine(sql);
         if (_dapper.ExecuteSql(sql))
         {
-            return Ok();
+          return Ok();
         }
 
         throw new Exception("Failed to Update User");
@@ -148,6 +163,7 @@ public class UserController : ControllerBase
 
     public IActionResult AddUser(UserToAddDto userToAdd)
     {
+      // Brackets around Column names probably aren't necessary;
         string sql = @"
         INSERT INTO TutorialAppSchema.Users
             (
@@ -163,7 +179,7 @@ public class UserController : ControllerBase
              "', '" + userToAdd.Email +
              "', '" + userToAdd.Gender +
              "', '" + userToAdd.Active +
-            "')";
+             "')";
 
         Console.WriteLine(sql);
         if (_dapper.ExecuteSql(sql))
@@ -181,7 +197,6 @@ public class UserController : ControllerBase
     {
         string sql = @"
         SET XACT_ABORT ON;
-
         BEGIN TRANSACTION
         DECLARE @UserID int;
         INSERT INTO TutorialAppSchema.Users
@@ -220,12 +235,38 @@ public class UserController : ControllerBase
 
         throw new Exception("Failed to Add User Job Info");
     }
+
+
+    [HttpPost("UserSalary")]
+
+    // this method doesn't work properly. it creates a redundant userId if the user exists. See AddUserJobInfo
+    // for a way to create a new UserId in the users table if no other user data is extant
+    public IActionResult PostUserSalary(UserSalary userSalaryForInsert)
+    //'s 
+    {
+        string sql = @"
+          INSERT INTO TutorialAppSchema.UserSalary (
+              UserId,
+              Salary
+              ) VALUES (
+                " + userSalaryForInsert.UserId
+                + "," + userSalaryForInsert.Salary + ")";
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            // userSalaryForInsert is an optional parameter that shows the object in the 200 response
+            return Ok(userSalaryForInsert);
+        }
+        throw new Exception("Adding UserSalary failed on save");
+    }
     // class Microsoft.AspNetCore.Mvc.HttpDeleteAttribute (+ 2 overloads)
     // Identifies an action that supports the HTTP DELETE method\.
     [HttpDelete("DeleteUser/{userId}")]
 
     public IActionResult DeleteUser(int userId)
     {
+        // userId may work without .ToString but since it is concatenation it's best practice and 
+        // will decrease chances of C# type errors.
         string sql = @"
            DELETE FROM TutorialAppSchema.Users 
               WHERE UserId = " + userId.ToString();

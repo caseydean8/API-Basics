@@ -29,7 +29,11 @@ public class UserEFController : ControllerBase
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<UserToAddDto, User>();
+        // Mapper for user doesn't work
+            cfg.CreateMap<User, UserToAddDto>();
+            // IMappingExpression<UserJobInfo, UserJobInfo> IProfileExpression.CreateMap<UserJobInfo, UserJobInfo>() (+ 1 overload)
+            cfg.CreateMap<UserJobInfo, UserJobInfo>();
+            cfg.CreateMap<UserSalary, UserSalary>();
         }));
     }
 
@@ -50,7 +54,7 @@ public class UserEFController : ControllerBase
         IEnumerable<UserJobInfo> users = _entityFramework.UserJobInfo.ToList<UserJobInfo>();
         return users;
     }
-  
+
 
     [HttpGet("GetSingleUser/{userId}")]
 
@@ -69,8 +73,41 @@ public class UserEFController : ControllerBase
     }
 
 
-    [HttpPut("EditUser")]
+    [HttpGet("GetSingleUserJobInfo/{userId}")]
 
+    public UserJobInfo GetSingleUserJobInfo(int userId)
+    {
+        UserJobInfo? user = _entityFramework.UserJobInfo
+          .Where(u => u.UserId == userId)
+         .FirstOrDefault<UserJobInfo>();
+
+        if (user != null)
+        {
+            return user;
+        }
+
+        throw new Exception("Failed to Get User");
+    }
+
+
+    [HttpGet("GetSingleUserSalary/{userId}")]
+
+    public UserSalary GetSingleUserSalary(int userId)
+    {
+        UserSalary? user = _entityFramework.UserSalary
+          .Where(u => u.UserId == userId)
+         .FirstOrDefault<UserSalary>();
+
+        if (user != null)
+        {
+            return user;
+        }
+
+        throw new Exception("Failed to Get User");
+    }
+
+
+    [HttpPut("EditUser")]
     // interface Microsoft.AspNetCore.Mvc.IActionResult
     // Defines a contract that represents the result of an action method\.
     // class Microsoft.AspNetCore.Mvc.FromBodyAttribute (+ 1 overload)
@@ -80,7 +117,8 @@ public class UserEFController : ControllerBase
     {
         User? userDb = _entityFramework.Users
           .Where(u => u.UserId == user.UserId)
-          .FirstOrDefault<User>();
+          .FirstOrDefault();
+        // .FirstOrDefault<User>();
 
         if (userDb != null)
         {
@@ -89,6 +127,33 @@ public class UserEFController : ControllerBase
             userDb.LastName = user.LastName;
             userDb.Email = user.Email;
             userDb.Gender = user.Gender;
+            if (_entityFramework.SaveChanges() > 0)
+            {
+                return Ok();
+            }
+
+            throw new Exception("Failed to Update User");
+        }
+
+        throw new Exception("Failed to Get User");
+    }
+
+
+    [HttpPut("EditUserJobInfo")]
+
+    public IActionResult EditUserJobInfo(UserJobInfo userForUpdate)
+    {
+        UserJobInfo? userDb = _entityFramework.UserJobInfo
+          .Where(u => u.UserId == userForUpdate.UserId)
+          // .FirstOrDefault<UserJobInfo>();
+          .FirstOrDefault();
+
+        if (userDb != null)
+        {
+            // userDb.JobTitle = userForUpdate.JobTitle;
+            // userDb.Department = userForUpdate.Department;
+            // UserJobInfo IMapperBase.Map<UserJobInfo, UserJobInfo>(UserJobInfo source, UserJobInfo destination) (+ 9 overloads)
+            _mapper.Map(userForUpdate, userDb);
             if (_entityFramework.SaveChanges() > 0)
             {
                 return Ok();
