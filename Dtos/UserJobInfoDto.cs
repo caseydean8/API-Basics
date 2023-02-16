@@ -1,7 +1,7 @@
-namespace DotnetAPI.Dtos
+
+namespace DotnetAPI
 {
     // it's good practice to make Models partial in case you need to add to them later from other files
-    // Dto: data transfer object
     public partial class UserJobInfoDto
     {
         public string JobTitle { get; set; }
@@ -9,7 +9,7 @@ namespace DotnetAPI.Dtos
 
         public UserJobInfoDto()
         {
-            if (JobTitle == null)
+            if (JobTitle  == null)
             {
                 JobTitle = "";
             }
@@ -21,3 +21,4 @@ namespace DotnetAPI.Dtos
     }
 
 }
+
