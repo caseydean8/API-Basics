@@ -1,4 +1,0 @@
-        _mapper = new Mapper(new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<UserToAddDto, User>();
-        }));
