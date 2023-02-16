@@ -7,6 +7,8 @@
 
 // The Repository pattern adds a separation layer between the data and domain layers of an application. 
 // It also makes the data access parts of an application better testable.
+using DotnetAPI.Models;
+
 namespace DotnetAPI.Data
 {
     public class UserRepository : IUserRepository
@@ -43,6 +45,61 @@ namespace DotnetAPI.Data
             {
                 _entityFramework.Remove(entityToAdd);
             }
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            //.Users: Microsoft.EntityFrameworkCore.DbSet<User> DataContextEF.Users { get; set; }
+            IEnumerable<User> users = _entityFramework.Users.ToList<User>();
+            return users;
+        }
+
+        public IEnumerable<UserJobInfo> GetUserJobInfo()
+        {
+            IEnumerable<UserJobInfo> users = _entityFramework.UserJobInfo.ToList<UserJobInfo>();
+            return users;
+        }
+
+        public User GetSingleUser(int userId)
+        {
+            User? user = _entityFramework.Users
+              .Where(u => u.UserId == userId)
+             .FirstOrDefault<User>();
+
+            if (user != null)
+            {
+                return user;
+            }
+
+            throw new Exception("Failed to Get User");
+        }
+
+        public UserJobInfo GetSingleUserJobInfo(int userId)
+        {
+            UserJobInfo? user = _entityFramework.UserJobInfo
+              .Where(u => u.UserId == userId)
+             .FirstOrDefault<UserJobInfo>();
+
+            if (user != null)
+            {
+                return user;
+            }
+
+            throw new Exception("Failed to Get User");
+        }
+
+        public UserSalary GetSingleUserSalary(int userId)
+        {
+            UserSalary? user = _entityFramework.UserSalary
+              .Where(u => u.UserId == userId)
+             .FirstOrDefault<UserSalary>();
+
+            if (user != null)
+            {
+                return user;
+            }
+
+            throw new Exception("Failed to Get User");
         }
     }
 }
