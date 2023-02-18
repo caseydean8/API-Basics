@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using DotnetAPI.Data;
 using DotnetAPI.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -12,6 +13,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace DotnetAPI.Controllers
 {
+    // class Microsoft.AspNetCore.Authorization.AuthorizeAttribute (+ 2 overloads)
+    // Specifies that the class or method that this attribute is applied to requires the specified authorization.
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly DataContextDapper _dapper;
@@ -22,6 +26,9 @@ namespace DotnetAPI.Controllers
             _config = config;
         }
 
+        // class Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute (+ 1 overload)
+        // Specifies that the class or method that this attribute is applied to does not require authorization\.
+        [AllowAnonymous]
         [HttpPost("Register")]
         public IActionResult Register(UserForRegistrationDto userForRegistration)
         {
@@ -96,6 +103,7 @@ namespace DotnetAPI.Controllers
             throw new Exception("Passwords do not match!");
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
         public IActionResult Login(UserForLoginDto userForLogin)
         {
@@ -130,6 +138,18 @@ namespace DotnetAPI.Controllers
             return Ok(new Dictionary<string, string> {
                 {"token", CreateToken(userId)}
                 });
+        }
+
+        [HttpGet("RefreshToken")]
+        public string RefreshToken()
+        {
+            string userIdSql = @"
+                SELECT UserId FROM TutorialAppSchema.Users
+                WHERE UserId = '" +
+                 User.FindFirst("userId")?.Value + "'";
+
+            int userId = _dapper.LoadDataSingle<int>(userIdSql);
+            return CreateToken(userId);
         }
 
         private byte[] GetPasswordHash(string password, byte[] passwordSalt)
